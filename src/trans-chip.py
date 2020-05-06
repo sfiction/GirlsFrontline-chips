@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     trans_file = './data/trans-chip.yml'
     with open(trans_file, 'r', encoding='utf-8', newline='\n') as fd:
-        trans = yaml.load(fd.read())
+        trans = yaml.load(fd.read(), Loader=yaml.Loader)
 
     mat_chips = re.search(r'(?<=\[\w!).*?(?=\?\w\])', content)
     if not mat_chips:
