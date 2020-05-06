@@ -1,0 +1,5 @@
+include_directories(${PROJECT_SOURCE_DIR}/src)
+add_executable(test_dlx test_dlx.cc)
+target_link_libraries(test_dlx dlx)
+# add_executable(test_chip test-chip-info.cc)
+# target_link_libraries(test_chip chip)
