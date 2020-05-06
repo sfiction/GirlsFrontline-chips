@@ -10,8 +10,13 @@ if [ ! -d "build" ]; then
     mkdir build
 fi
 cd build
-cmake -G "MinGW Makefiles" ../ .
-mingw32-make
+if command -v mingw32-make; then
+    cmake -G "MinGW Makefiles" -S ../ -B .
+    mingw32-make
+else
+    cmake -S ../ -B .
+    make
+fi
 cd ..
 
 python3 src/trans-chip.py
