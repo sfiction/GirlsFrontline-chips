@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <vector>

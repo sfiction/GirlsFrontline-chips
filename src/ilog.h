@@ -1,9 +1,12 @@
 #pragma once
 
 #include <cstdio>
+#include <cstring>
 
+#include <array>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
 

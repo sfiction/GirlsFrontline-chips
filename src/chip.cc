@@ -162,11 +162,11 @@ int read_chips(const char *file, vector<Chip> &chips){
 int read_weapons(FILE *fd, vector<Weapon> &weapons){
     weapons.clear();
 
-    int id;
+    int id, color;
     char buf[20];
-    while (fscanf(fd, "%d", &id) == 1){
+    while (fscanf(fd, "%d%d", &id, &color) == 2){
         fscanf(fd, "%10s", buf);
-        weapons.emplace_back(id, buf, Shape::read(fd));
+        weapons.emplace_back(id, (Piece::Color)color, buf, Shape::read(fd));
         MALL("%s", weapons.back().to_string().c_str());
     }
     return 0;

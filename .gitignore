@@ -1,2 +1,7 @@
 *~
-
+*.swp
+*.cmake
+CMakeFiles
+/build
+/data/covers-*
+/user

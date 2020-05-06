@@ -14,13 +14,13 @@ if __name__ == '__main__':
     
     raw_file = './user/chips-raw'
     with open(raw_file, 'r', encoding='utf-8', newline='\n') as fd:
-        content = fd.read();
+        content = fd.read().strip()
 
     trans_file = './data/trans-chip.yml'
     with open(trans_file, 'r', encoding='utf-8', newline='\n') as fd:
         trans = yaml.load(fd.read())
 
-    mat_chips = re.search(r'(?<=\[I!).*?(?=\?F\])', content)
+    mat_chips = re.search(r'(?<=\[\w!).*?(?=\?\w\])', content)
     if not mat_chips:
         print('parse failed', file=sys.stderr)
         exit(1)

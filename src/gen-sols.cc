@@ -94,7 +94,7 @@ int main(){
         map_weapons.emplace(x.id, x);
 
     // select weapon
-    constexpr int weapon_id = 5;
+    constexpr int weapon_id = 0;
     auto p = map_weapons.find(weapon_id);
     if (p == map_weapons.end()){
         MERROR("cant find the weapon %d", weapon_id);
@@ -115,7 +115,7 @@ int main(){
     vector<vector<Piece>> cand_pieces(28);
     int cnt_cand = 0;
     for (auto &piece: pieces)
-        if (piece.color == Piece::Red && piece.gp <= 0){
+        if (piece.color == weapon.color && piece.gp <= 0){
             cnt_cand += 1;
             cand_pieces[piece.id].push_back(piece);
         }
@@ -123,6 +123,7 @@ int main(){
 
     ::limit = Piece::Attr{206, 60, 97, 148};
     ::limit = Piece::Attr{122, 143, 134, 240};
+    ::limit = Piece::Attr{185, 328, 135, 43};
     vector<pair<vector<pair<int, int>>, Piece::Attr>> sols;
     for (auto &cover: covers){
         MINFO("%s", to_string(cover).c_str());

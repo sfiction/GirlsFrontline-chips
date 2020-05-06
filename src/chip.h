@@ -100,12 +100,13 @@ inline bool allgt(const Piece::Attr &l, const Piece::Attr &r){
 
 struct Weapon: public Shape{
     int id;
+    Piece::Color color;
     std::string name;
 
     Weapon(){}
 
-    Weapon(int id, std::string name, Shape &&shape)
-        : id(id), name(name), Shape(shape){}
+    Weapon(int id, Piece::Color color, std::string name, Shape &&shape)
+        : id(id), color(color), name(name), Shape(shape){}
 };
 
 int read_chips(FILE *fd, std::vector<Chip> &chips);
