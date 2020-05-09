@@ -11,11 +11,14 @@
 
 using namespace std;
 
+using Solution = pair<vector<int>, string>;
+
 int generate_covers(const vector<Shape> &chips, const Shape &weapon,
-        vector<vector<int>> &sols){
+        vector<Solution> &sols){
 
     vector<vector<int>> prob;
     vector<int> ids;
+    vector<vector<int>> locs;
     for (size_t i = 0; i < chips.size(); ++i){
         Shape chip = chips[i];
 
@@ -24,12 +27,18 @@ int generate_covers(const vector<Shape> &chips, const Shape &weapon,
 
             for (int x = 0; x <= dh; ++x)
                 for (int y = 0; y <= dw; ++y){
-                    auto locs = weapon.cover(chip, x, y);
-                    if (locs.size() != chip.a.size())
+                    vector<int> locids = weapon.cover(chip, x, y);
+                    if (locids.size() != chip.a.size())
                         continue;
 
-                    prob.emplace_back(move(locs));
                     ids.emplace_back(i);
+                    locs.emplace_back();
+                    locs.back().reserve(locids.size());
+                    for (int locid: locids){
+                        pair<int, int> t = weapon.a[locid];
+                        locs.back().push_back(t.first * weapon.w + t.second);
+                    }
+                    prob.emplace_back(move(locids));
                 }
 
             chip = rotate(chip);
@@ -37,14 +46,26 @@ int generate_covers(const vector<Shape> &chips, const Shape &weapon,
         while (chip != chips[i]);
     }
 
-    sols.clear();
-    dlx::solve_sparse(prob, sols);
+    vector<vector<int>> raw_sols;
+    dlx::solve_sparse(prob, raw_sols);
+    MDEBUG("%s", to_string(raw_sols).c_str());
 
-    MDEBUG("%s", to_string(sols).c_str());
+    sols.reserve(raw_sols.size());
+    string t(weapon.h * weapon.w, '_');
+    for (auto& raw_sol: raw_sols){
+        sols.emplace_back();
+        auto& sol = sols.back();
 
-    for (auto &sol: sols)
-        for (auto &x: sol)
-            x = ids[x];
+        sol.first.reserve(raw_sol.size());
+        t.assign(t.size(), '_');
+        for (size_t i = 0; i < raw_sol.size(); ++i) {
+            int id = raw_sol[i];
+            sol.first.push_back(ids[id]);
+            for (int loc: locs[id])
+                t[loc] = '0' + i;
+        }
+        sol.second = t;
+    }
 
     MDEBUG("%s", to_string(sols).c_str());
 
@@ -53,7 +74,7 @@ int generate_covers(const vector<Shape> &chips, const Shape &weapon,
     return 0;
 }
 
-int write_solutions(const char *file, vector<vector<int>> &sols){
+int write_solutions(const char* file, const vector<Solution>& sols){
     FILE *fd = fopen(file, "w");
     if (file == nullptr){
         MERROR("failed open file");
@@ -62,9 +83,11 @@ int write_solutions(const char *file, vector<vector<int>> &sols){
 
     fprintf(fd, "%zu\n", sols.size());
     for (auto &sol: sols){
-        fprintf(fd, "%zu", sol.size());
-        for (auto &e: sol)
+        const vector<int>& chip_sol = sol.first;
+        fprintf(fd, "%zu", chip_sol.size());
+        for (auto &e: chip_sol)
             fprintf(fd, " %d", e);
+        fprintf(fd, " %s", sol.second.c_str());
         fputc('\n', fd);
     }
     return 0;
@@ -77,7 +100,7 @@ int generate_covers(const char *file, const vector<Chip> &chips, const Weapon &w
     for (auto &chip: chips)
         shapes.push_back((Shape)chip);
 
-    vector<vector<int>> sols;
+    vector<Solution> sols;
     ret = generate_covers(shapes, weapon, sols);
     if (ret != 0){
         MERROR("failed find solutions");
@@ -90,16 +113,18 @@ int generate_covers(const char *file, const vector<Chip> &chips, const Weapon &w
 
     MDEBUG("%s", to_string(sols).c_str());
     for (auto &sol: sols)
-        sort(sol.begin(), sol.end());
+        sort(sol.first.begin(), sol.first.end());
     MDEBUG("%s", to_string(sols).c_str());
     sort(sols.begin(), sols.end());
     MDEBUG("%s", to_string(sols).c_str());
-    sols.erase(unique(sols.begin(), sols.end()), sols.end());
+    sols.erase(unique(sols.begin(), sols.end(), [](const Solution& l, const Solution& r){
+            return l.first == r.first;
+        }), sols.end());
 
     MINFO("has %zu solutions after unique", sols.size());
 
     for (auto &sol: sols)
-        for (auto &id: sol)
+        for (auto &id: sol.first)
             id = chips[id].id;
 
     ret = write_solutions(file, sols);

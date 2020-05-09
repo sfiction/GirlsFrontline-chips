@@ -46,6 +46,9 @@ inline std::string to_string(const std::string &s){
     return s;
 }
 
+template <typename T>
+std::string to_string(const std::vector<T> &a);
+
 template <typename T1, typename T2>
 std::string to_string(const std::pair<T1, T2> &a){
     using ::to_string;

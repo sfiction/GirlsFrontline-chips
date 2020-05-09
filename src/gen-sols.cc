@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <algorithm>
 #include <map>
 #include <vector>
 
@@ -8,7 +9,10 @@
 
 using namespace std;
 
-int read_covers(FILE *fd, vector<vector<int>> &covers){
+using Cover = pair<vector<int>, string>;
+
+int read_covers(FILE *fd, vector<Cover> &covers){
+    static char buf[1024];
     int n;
     fscanf(fd, "%d", &n);
     covers.clear();
@@ -16,9 +20,14 @@ int read_covers(FILE *fd, vector<vector<int>> &covers){
     for (int i = 0; i < n; ++i){
         int m;
         fscanf(fd, "%d", &m);
-        covers.emplace_back(m);
+        covers.emplace_back();
+        Cover& cover = covers.back();
+        cover.first.resize(m);
         for (int j = 0; j < m; ++j)
-            fscanf(fd, "%d", &covers.back()[j]);
+            fscanf(fd, "%d", &cover.first[j]);
+        fscanf(fd, "%s", buf);
+        cover.second = buf;
+        replace(cover.second.begin(), cover.second.end(), '_', ' ');
     }
     return 0;
 }
@@ -94,7 +103,7 @@ int main(){
         map_weapons.emplace(x.id, x);
 
     // select weapon
-    constexpr int weapon_id = 0;
+    constexpr int weapon_id = 4;
     auto p = map_weapons.find(weapon_id);
     if (p == map_weapons.end()){
         MERROR("cant find the weapon %d", weapon_id);
@@ -108,7 +117,7 @@ int main(){
         return 1;
     }
 
-    vector<vector<int>> covers;
+    vector<Cover> covers;
     read_covers(fd, covers);
     MINFO("read %zu covers from %s", covers.size(), str_file.c_str());
 
@@ -122,16 +131,25 @@ int main(){
     MDEBUG("num of candidates = %d", cnt_cand);
 
     ::limit = Piece::Attr{206, 60, 97, 148};
-    ::limit = Piece::Attr{122, 143, 134, 240};
     ::limit = Piece::Attr{185, 328, 135, 43};
+    ::limit = Piece::Attr{122, 143, 132, 240};  // 5
+    ::limit = Piece::Attr{162, 260, 172, 68};  // 4
     vector<pair<vector<pair<int, int>>, Piece::Attr>> sols;
+    vector<int> cover_head;
     for (auto &cover: covers){
+        cover_head.push_back(sols.size());
         MINFO("%s", to_string(cover).c_str());
-        find_sols(cover, cand_pieces, sols);
+        find_sols(cover.first, cand_pieces, sols);
     }
+    cover_head.push_back(sols.size());
 
     fprintf(stdout, "find %zu solutions over limit %s\n", sols.size(), to_string(::limit).c_str());
-    for (auto &x: sols){
+    for (size_t j = 0, i = 0; i < sols.size(); ++i){
+        for (; i == cover_head[j]; ++j);
+        for (size_t h = 0; h < weapon.h; ++h)
+            fprintf(stdout, "%s\n", covers[j - 1].second.substr(h * weapon.w, weapon.w).c_str());
+
+        auto& x = sols[i];
         auto &ids = x.first;
         auto &attr = x.second;
         
