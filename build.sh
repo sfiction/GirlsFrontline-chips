@@ -20,7 +20,7 @@ fi
 cd ..
 
 python3 src/trans-chip.py
-if [ ! -f "data/cover-BGM-71" ]; then
+if [ ! -f "data/covers-BGM-71" ]; then
     ./build/src/gen_cover
 fi
 ./build/src/gen_sols

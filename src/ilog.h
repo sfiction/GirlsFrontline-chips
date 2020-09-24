@@ -18,7 +18,7 @@ enum{
     ALL = 5,
 };
 
-constexpr int LOG_LEVEL = ERROR;
+constexpr int LOG_LEVEL = INFO;
 
 template <class... Args>
 void log_msg(int level, Args... args){

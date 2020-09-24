@@ -167,12 +167,8 @@ int main(){
         if (chip.gp == 0)
             top_chips.push_back(chip);
 
-    for (int i = 0; i < 6; ++i){
-        auto p = map_weapons.find(i);
-        if (p == map_weapons.end())
-            continue;
-
-        Weapon &weapon = p->second;
+    for (auto &pr: map_weapons) {
+        Weapon &weapon = pr.second;
         string str_file = format(string("./data/covers-"), weapon.name);
         MINFO("find covers of %s", weapon.name.c_str());
         int ret = generate_covers(str_file.c_str(), top_chips, weapon);
