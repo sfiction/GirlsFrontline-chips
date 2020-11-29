@@ -88,6 +88,7 @@ Piece::Piece(int color, int clazz, int id, int (&tval)[4])
         int attr_weight = attr_weights[i];
 
         val[i] = (tval[i] * attr_weight * gp_weight + 999) / 1000;
+        val0[i] = val[i];
         val[i] = (val[i] * 25 + 9) / 10;
     }
 }

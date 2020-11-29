@@ -71,6 +71,7 @@ struct Piece{
     int id;
     using Attr = std::array<int, 4>;
     Attr val; // damage, dbk, accuracy, loading
+    Attr val0;
 
     Piece(): star(), n(0){}
 
@@ -89,6 +90,19 @@ struct Piece{
 inline Piece::Attr operator +(const Piece::Attr &l, const Piece::Attr &r){
     Piece::Attr res{l[0] + r[0], l[1] + r[1], l[2] + r[2], l[3] + r[3]};
     return res;
+}
+
+
+inline Piece::Attr operator -(const Piece::Attr &l, const Piece::Attr &r){
+    Piece::Attr res{l[0] - r[0], l[1] - r[1], l[2] - r[2], l[3] - r[3]};
+    return res;
+}
+
+inline int div_ceil_sum(const Piece::Attr &l, const Piece::Attr &r) {
+    return (l[0] + r[0] - 1) / r[0]
+        + (l[1] + r[1] - 1) / r[1]
+        + (l[2] + r[2] - 1) / r[2]
+        + (l[3] + r[3] - 1) / r[3];
 }
 
 inline bool allgt(const Piece::Attr &l, const Piece::Attr &r){

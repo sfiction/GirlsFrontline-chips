@@ -27,6 +27,7 @@ void log_msg(int level, Args... args){
 
     fprintf(stderr, args...);
     fputc('\n', stderr);
+    fflush(stderr);
 }
 
 #define LOG_MSG(LEVEL, pattern, ...)\

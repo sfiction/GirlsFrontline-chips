@@ -112,8 +112,24 @@ int generate_covers(const char *file, const vector<Chip> &chips, const Weapon &w
     }
 
     MDEBUG("%s", to_string(sols).c_str());
-    for (auto &sol: sols)
-        sort(sol.first.begin(), sol.first.end());
+    for (auto &sol: sols) {
+        auto& ids = sol.first;
+        vector<pair<int, int>> prs(ids.size());
+        vector<int> trans(ids.size());
+
+        for (size_t i = 0; i < prs.size(); ++i)
+            prs[i] = {ids[i], i};
+        sort(prs.begin(), prs.end());
+
+        for (size_t i = 0; i < prs.size(); ++i)
+            ids[i] = prs[i].first;
+        for (size_t i = 0; i < prs.size(); ++i)
+            trans[prs[i].second] = i;
+
+        for (char& c: sol.second)
+            if ('0' <= c && c <= '9')
+                c = trans[c - '0'] + '0';
+    }
     MDEBUG("%s", to_string(sols).c_str());
     sort(sols.begin(), sols.end());
     MDEBUG("%s", to_string(sols).c_str());
